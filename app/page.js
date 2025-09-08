@@ -4,13 +4,6 @@ import { useState } from 'react';
 // ====== BRAND ======
 const LOGO_URL = '/logo.png'; // ensure /public/logo.png exists
 
-// ====== API BASE ======
-// Uses Vercel env if present, otherwise falls back to your working Render URL.
-// If you change your Render domain, update the fallback string.
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ||
-  "https://sheeni-server.onrender.com"; // <— your API
-
 export default function Page() {
   return (
     <main className="min-h-screen">
@@ -19,8 +12,8 @@ export default function Page() {
       <How/>
       <Features/>
       <Reviews/>
-      <CustomerSignup/>   {/* separate section */}
-      <CleanerSignup/>    {/* separate section */}
+      <CustomerSignup/>
+      <CleanerSignup/>
       <Footer/>
     </main>
   );
@@ -31,7 +24,6 @@ function Header(){
     <header className="sticky top-0 z-50 backdrop-blur bg-night/70 border-b border-white/10">
       <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
         <a href="#" className="flex items-center gap-3">
-          {/* Bigger header logo */}
           <img src={LOGO_URL} className="h-12 w-12 rounded-lg shadow ring-1 ring-white/10" alt="Sheeni logo"/>
           <div className="flex flex-col leading-tight">
             <span className="font-semibold text-xl tracking-tight">Sheeni</span>
@@ -75,7 +67,6 @@ function Hero(){
       <div className="relative">
         <div className="absolute -inset-10 bg-emerald-600/15 blur-3xl rounded-3xl"></div>
         <div className="relative rounded-2xl border border-white/10 bg-white/5 p-8 flex flex-col items-center">
-          {/* MASSIVE center-stage logo */}
           <img
             src={LOGO_URL}
             alt="Sheeni mascot"
@@ -181,11 +172,12 @@ function CustomerForm(){
     try {
       const fd = new FormData(e.currentTarget);
       const payload = Object.fromEntries(fd.entries());
-  const r = await fetch(`/api/waitlist/customer`, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  });
+
+      const r = await fetch('/api/waitlist/customer', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
 
       const j = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
@@ -194,7 +186,7 @@ function CustomerForm(){
       setFormKey(k => k + 1);
       setSent(true);
     } catch (err) {
-      alert("Submission failed: " + (err.message || "network error"));
+      alert('Submission failed: ' + (err.message || 'network error'));
     } finally {
       setLoading(false);
     }
@@ -219,7 +211,7 @@ function CustomerForm(){
                 className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
       <button type="submit" disabled={loading}
               className="bg-emerald-500 hover:bg-emerald-400 rounded px-4 py-2 font-medium md:col-span-2">
-        {loading ? "Submitting…" : "Join waitlist"}
+        {loading ? 'Submitting…' : 'Join waitlist'}
       </button>
       {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
     </form>
@@ -253,11 +245,13 @@ function CleanerForm(){
     try {
       const fd = new FormData(e.currentTarget);
       const payload = Object.fromEntries(fd.entries());
-      const r = await fetch(`/api/waitlist/cleaner`, {
-  method:'POST',
-  headers:{'Content-Type':'application/json'},
-  body: JSON.stringify(payload)
-});
+
+      const r = await fetch('/api/waitlist/cleaner', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+
       const j = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
 
@@ -265,7 +259,7 @@ function CleanerForm(){
       setFormKey(k => k + 1);
       setSent(true);
     } catch (err) {
-      alert("Submission failed: " + (err.message || "network error"));
+      alert('Submission failed: ' + (err.message || 'network error'));
     } finally {
       setLoading(false);
     }
@@ -290,7 +284,7 @@ function CleanerForm(){
                 className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
       <button type="submit" disabled={loading}
               className="bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium md:col-span-2">
-        {loading ? "Submitting…" : "Apply as a cleaner"}
+        {loading ? 'Submitting…' : 'Apply as a cleaner'}
       </button>
       {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
     </form>
@@ -302,7 +296,6 @@ function Footer(){
     <footer className="border-t border-white/10 mt-10">
       <div className="mx-auto max-w-6xl px-4 py-10 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* Keep logo visible down here too */}
           <img src={LOGO_URL} className="h-10 w-10 rounded-md shadow" alt="Sheeni logo"/>
           <span className="font-semibold">Sheeni</span>
         </div>
