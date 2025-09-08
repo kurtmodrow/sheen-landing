@@ -181,11 +181,12 @@ function CustomerForm(){
     try {
       const fd = new FormData(e.currentTarget);
       const payload = Object.fromEntries(fd.entries());
-      const r = await fetch(`${API_BASE}/waitlist/customer`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
+  const r = await fetch(`/api/waitlist/customer`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+
       const j = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
 
@@ -252,11 +253,11 @@ function CleanerForm(){
     try {
       const fd = new FormData(e.currentTarget);
       const payload = Object.fromEntries(fd.entries());
-      const r = await fetch(`${API_BASE}/waitlist/cleaner`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
+      const r = await fetch(`/api/waitlist/cleaner`, {
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body: JSON.stringify(payload)
+});
       const j = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
 
