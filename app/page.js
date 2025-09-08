@@ -86,7 +86,7 @@ function Hero(){
             and a nearby pro appears—ready to grant spotless wishes.
           </p>
           <div className="mt-5 flex gap-3">
-            <a href="#signup-customers" className="px-4 py-2 bg-emerald-500/90 rounded">Book now</a>
+            <a href="#signup-customers" className="px-4 py-2 bg-emerald-500/90 rounded">Register Interest</a>
             <a href="#signup-cleaners" className="px-4 py-2 bg-white/10 rounded border border-white/15">Become a Genie</a>
           </div>
         </div>
