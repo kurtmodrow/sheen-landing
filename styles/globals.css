@@ -1,6 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./app/**/*.{js,jsx}", "./components/**/*.{js,jsx}"],
-  theme: { extend: { colors: { night: "#0B0F1A" } } },
-  plugins: [],
-};
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --bg: #0B0F1A; }
+body { background: var(--bg); color: white; }
