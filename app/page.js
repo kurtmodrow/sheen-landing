@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 const LOGO_URL = '/logo.png'; // upload your Sheeni logo as /public/logo.png
-const API_BASE = https://sheeni-server.onrender.com;
+const API_BASE = "https://sheeni-server.onrender.com";
 
 export default function Page() {
   const [tab, setTab] = useState('customer');
