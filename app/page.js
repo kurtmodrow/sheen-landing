@@ -167,52 +167,57 @@ function SignupSection({tab,setTab}){
 }
 
 function CustomerForm(){
-  const [sent,setSent] = useState(false);
-  async function submit(e){
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(fd.entries());
-    const r = await fetch(`${API_BASE}/waitlist/customer`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    if(r.ok){ setSent(true); e.currentTarget.reset(); } else { alert('Error submitting form'); }
-  }
-  return (
-    <form onSubmit={submit} className="grid md:grid-cols-2 gap-3">
-      <input name="name" placeholder="Full name" className="bg-white/10 border border-white/15 rounded px-3 py-2" required />
-      <input type="email" name="email" placeholder="Email" className="bg-white/10 border border-white/15 rounded px-3 py-2" required />
-      <input name="phone" placeholder="Phone" className="bg-white/10 border border-white/15 rounded px-3 py-2" />
-      <input name="zip" placeholder="ZIP code" className="bg-white/10 border border-white/15 rounded px-3 py-2" />
-      <textarea name="notes" placeholder="What needs cleaning? (rooms, priorities)" className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
-      <button className="bg-emerald-500 hover:bg-emerald-400 rounded px-4 py-2 font-medium md:col-span-2">Join waitlist</button>
-      {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
-    </form>
-  );
-}
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formKey, setFormKey] = useState(0);   // <- new
 
-function CleanerForm(){
-  const [sent,setSent] = useState(false);
   async function submit(e){
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(fd.entries());
-    const r = await fetch(`${API_BASE}/waitlist/cleaner`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    if(r.ok){ setSent(true); e.currentTarget.reset(); } else { alert('Error submitting form'); }
+    setLoading(true); setSent(false);
+    try {
+      const fd = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(fd.entries());
+
+      const r = await fetch(`${API_BASE}/waitlist/customer`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
+
+      // success: clear + force remount (works around autofill/IOS quirks)
+      e.currentTarget.reset();
+      setFormKey(k => k + 1);
+      setSent(true);
+    } catch (err) {
+      alert("Submission failed: " + (err.message || "network error"));
+    } finally {
+      setLoading(false);
+    }
   }
+
   return (
-    <form onSubmit={submit} className="grid md:grid-cols-2 gap-3">
-      <input name="name" placeholder="Full name" className="bg-white/10 border border-white/15 rounded px-3 py-2" required />
-      <input type="email" name="email" placeholder="Email" className="bg-white/10 border border-white/15 rounded px-3 py-2" required />
-      <input name="phone" placeholder="Phone" className="bg-white/10 border border-white/15 rounded px-3 py-2" />
-      <input name="service_area" placeholder="Service area (ZIPs or neighborhoods)" className="bg-white/10 border border-white/15 rounded px-3 py-2" />
-      <textarea name="experience" placeholder="Experience (years, specialties)" className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
-      <button className="bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium md:col-span-2">Apply as a cleaner</button>
+    <form
+      key={formKey}                 // <- force remount after success
+      onSubmit={submit}
+      autoComplete="off"            // <- reduce autofill “stickiness”
+      className="grid md:grid-cols-2 gap-3"
+    >
+      <input name="name" required placeholder="Full name" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input type="email" name="email" required placeholder="Email" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="phone" placeholder="Phone" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="zip" placeholder="ZIP code" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <textarea name="notes" placeholder="What needs cleaning? (rooms, priorities)"
+                className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28" />
+      <button type="submit" disabled={loading}
+              className="bg-emerald-500 hover:bg-emerald-400 rounded px-4 py-2 font-medium md:col-span-2">
+        {loading ? "Submitting…" : "Join waitlist"}
+      </button>
       {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
     </form>
   );
