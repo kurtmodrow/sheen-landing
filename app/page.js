@@ -58,8 +58,8 @@ function Hero(){
           first to accept claims it and heads your way.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href="#signup-customers" className="bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium">I want cleaning</a>
-          <a href="#signup-cleaners" className="bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/40 px-4 py-2 rounded-lg font-medium">I want to clean</a>
+          <a href="#signup-customers" className="bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium">Book a Cleaner</a>
+          <a href="#signup-cleaners" className="bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/40 px-4 py-2 rounded-lg font-medium">Become a Cleaner</a>
         </div>
       </div>
 
