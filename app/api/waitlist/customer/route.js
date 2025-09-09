@@ -8,27 +8,24 @@ const supabase = createClient(
 );
 
 export async function POST(req) {
-  try {
-    const body = await req.json();
-    if (!body?.email) {
-      return NextResponse.json({ error: "Email is required." }, { status: 400 });
-    }
-
-    const { data, error } = await supabase
-      .schema("waitlist")
-      .from("customer")
-      .insert({
-        name: body.name ?? null,
-        email: body.email,
-        message: body.message ?? null,
-        source: "web",
-      })
-      .select()
-      .single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-    return NextResponse.json({ ok: true, id: data.id });
-  } catch (err) {
-    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+  const body = await req.json();
+  if (!body?.email) {
+    return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
+
+  const { data, error } = await supabase
+    .schema("waitlist")
+    .from("customer")
+    .insert({
+      name: body.name ?? null,
+      email: body.email,
+      phone: body.phone ?? null,
+      message: body.message ?? null,
+      source: "web",
+    })
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ ok: true, id: data.id });
 }
