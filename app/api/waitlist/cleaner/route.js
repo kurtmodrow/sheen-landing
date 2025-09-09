@@ -1,25 +1,38 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { persistSession: false } }
+);
+
 export async function POST(req) {
   try {
     const body = await req.json();
-    const API_BASE =
-      process.env.NEXT_PUBLIC_API_BASE || "https://sheeni-server.onrender.com";
+    if (!body?.email) {
+      return NextResponse.json({ error: "Email is required." }, { status: 400 });
+    }
 
-    const r = await fetch(`${API_BASE}/waitlist/cleaner`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const { data, error } = await supabase
+      .schema("waitlist")
+      .from("cleaners")
+      .insert({
+        name: body.name ?? null,
+        email: body.email,
+        message: body.message ?? null,
+        city: body.city ?? null,
+        service_area: body.service_area ?? null,
+        experience_years: body.experience_years ?? null,
+        vehicle: body.vehicle ?? null,
+        source: "web",
+      })
+      .select()
+      .single();
 
-    const data = await r.json().catch(() => ({}));
-
-    return new Response(JSON.stringify(data), {
-      status: r.status,
-      headers: { "Content-Type": "application/json" },
-    });
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ ok: true, id: data.id });
   } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Proxy failed", details: err.message }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
   }
 }
