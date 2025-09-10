@@ -1,299 +1,186 @@
 'use client';
 import { useState } from 'react';
 
-// ========= CONFIG =========
-// If your file is literally "Sheeni Logo.png", set LOGO_URL to '/Sheeni%20Logo.png'
-// or (recommended) rename it to /public/logo.png and keep '/logo.png'
-const LOGO_URL = '/logo.png';
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || ''; // e.g. https://sheeni-server.onrender.com
-
-// POST helper with solid error handling
-async function postJSON(path, payload) {
-  const r = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    cache: 'no-store',
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
-  return j;
-}
+// ====== BRAND ======
+const LOGO_URL = '/logo.png'; // ensure /public/logo.png exists
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || ''; // leave blank for same-origin API routes
 
 export default function Page() {
-  const [tab, setTab] = useState('customer'); // 'customer' | 'cleaner'
-
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      {/* Background accents */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_30rem_at_50%_-10%,rgba(99,102,241,0.18),transparent)]" />
-      <Header />
-
-      <Hero tab={tab} setTab={setTab} />
-
-      <Section className="py-12">
-        <Card>
-          <Tabs tab={tab} setTab={setTab} />
-          {tab === 'customer' ? <CustomerForm /> : <CleanerForm />}
-        </Card>
-      </Section>
-
-      <Features />
-      <HowItWorks />
-      <SocialProof />
-      <CTA />
-
-      <Footer />
+    <main className="min-h-screen">
+      <Header/>
+      <Hero/>
+      <How/>
+      <Features/>
+      <Reviews/>
+      <CustomerSignup/>
+      <CleanerSignup/>
+      <Footer/>
     </main>
   );
 }
 
-/* ----------------- UI SECTIONS ----------------- */
-
-function Header() {
+function Header(){
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/70 backdrop-blur">
-      <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <img
-            src={LOGO_URL}
-            alt="Sheeni logo"
-            className="h-7 w-7 rounded-md object-contain ring-1 ring-white/10 shadow"
-            width={28}
-            height={28}
-          />
-          <span className="font-semibold tracking-tight">Sheeni</span>
-        </div>
-        <nav className="hidden md:flex items-center gap-6 text-white/80">
-          <a href="#features" className="hover:text-white">Features</a>
+    <header className="sticky top-0 z-50 backdrop-blur bg-night/70 border-b border-white/10">
+      <div className="mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
+        <a href="#" className="flex items-center gap-3">
+          <img src={LOGO_URL} className="h-12 w-12 rounded-lg shadow ring-1 ring-white/10" alt="Sheeni logo"/>
+          <div className="flex flex-col leading-tight">
+            <span className="font-semibold text-xl tracking-tight">Sheeni</span>
+            <span className="text-emerald-300/80 text-[11px] border border-emerald-300/30 rounded-full px-2 py-[1px] w-fit">
+              The Cleaning Genie
+            </span>
+          </div>
+        </a>
+        <nav className="hidden md:flex gap-5 text-white/80">
           <a href="#how" className="hover:text-white">How it works</a>
-          <a href="#faq" className="hover:text-white">FAQ</a>
+          <a href="#signup-customers" className="hover:text-white">Customers</a>
+          <a href="#signup-cleaners" className="hover:text-white">Cleaners</a>
         </nav>
       </div>
     </header>
   );
 }
 
-function Hero({ tab, setTab }) {
+function Hero(){
   return (
-    <Section className="py-14 md:py-20">
-      <div className="grid md:grid-cols-2 items-center gap-10">
-        <div>
-          <Badge>✨ Sheeni the Genie — small mess, big relief.</Badge>
-          <h1 className="mt-4 text-4xl md:text-6xl font-semibold leading-[1.05]">
-            Book a trusted cleaner in minutes.
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">
-              Track arrival. Relax sooner.
-            </span>
-          </h1>
-          <p className="mt-4 text-white/80 max-w-prose">
-            Join the interest list to be first in line when Sheeni launches in your area.
-            Our goal is <span className="text-white">under 60 minutes</span> from request to cleaner on-route —
-            <span className="text-white/70"> this is a target, not a guarantee</span>. Early sign-ups get first-dibs at launch.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            <Button
-              variant={tab === 'customer' ? 'primary' : 'ghost'}
-              onClick={() => setTab('customer')}
-            >
-              Join as Customer
-            </Button>
-            <Button
-              variant={tab === 'cleaner' ? 'primary' : 'ghost'}
-              onClick={() => setTab('cleaner')}
-            >
-              Apply as Cleaner
-            </Button>
-          </div>
+    <section className="mx-auto max-w-6xl px-4 pt-14 pb-12 grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/80">
+          New in Orlando ✨
         </div>
-
-        {/* Compact above-the-fold form card */}
-        <Card className="p-6">
-          {tab === 'customer' ? <CustomerForm compact /> : <CleanerForm compact />}
-        </Card>
-      </div>
-    </Section>
-  );
-}
-
-function Features() {
-  const items = [
-    {
-      t: 'Fast matching',
-      d: 'Get paired with a nearby pro the moment you submit a request.',
-    },
-    {
-      t: 'Live ETA tracking',
-      d: 'See your cleaner on the map with precise arrival estimates.',
-    },
-    {
-      t: 'Flexible jobs',
-      d: 'Quick tidy-ups or deeper cleans — choose exactly what you need.',
-    },
-  ];
-  return (
-    <Section id="features" className="py-14">
-      <h2 className="text-2xl md:text-3xl font-semibold mb-6">Made for real life messes</h2>
-      <div className="grid md:grid-cols-3 gap-4">
-        {items.map(({ t, d }) => (
-          <Card key={t}>
-            <div className="text-lg font-medium mb-1">{t}</div>
-            <div className="text-white/75">{d}</div>
-          </Card>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    ['Request', 'Tell us what you need and where.'],
-    ['Match', 'We connect you to a nearby cleaner.'],
-    ['Track', 'See live ETA and arrival updates.'],
-    ['Relax', 'Pay securely after the job is done.'],
-  ];
-  return (
-    <Section id="how" className="py-14">
-      <h2 className="text-2xl md:text-3xl font-semibold mb-6">How it works</h2>
-      <ol className="grid md:grid-cols-4 gap-4 counter-reset">
-        {steps.map(([t, d], i) => (
-          <li key={t} className="relative">
-            <Card>
-              <div className="text-sm text-white/60 mb-1">Step {i + 1}</div>
-              <div className="text-lg font-medium">{t}</div>
-              <div className="text-white/75 mt-1">{d}</div>
-            </Card>
-          </li>
-        ))}
-      </ol>
-    </Section>
-  );
-}
-
-function SocialProof() {
-  return (
-    <Section className="py-14">
-      <Card className="text-center p-8">
-        <p className="text-xl md:text-2xl font-medium">
-          “It felt like food delivery, but for cleaning — the ETA was spot on.”
+        <h1 className="mt-4 text-4xl md:text-5xl font-bold leading-tight">
+          Your wish for a clean home, <span className="text-emerald-400">granted</span>.
+        </h1>
+        <p className="mt-4 text-white/80">
+          Book exactly the time you need—quick 1-hour spruce-ups, focused 2-hour refreshes,
+          or longer deep cleans. Upload photos and describe the job. Cleaners get an Instacart-style alert;
+          first to accept claims it and heads your way.
         </p>
-        <p className="mt-2 text-white/70">— Early beta tester</p>
-      </Card>
-    </Section>
-  );
-}
-
-function CTA() {
-  return (
-    <Section className="py-14">
-      <Card className="flex flex-col md:flex-row items-center justify-between gap-4 p-6">
-        <div>
-          <h3 className="text-xl md:text-2xl font-semibold">Be first at launch</h3>
-          <p className="text-white/75">Join now and get priority access when your city goes live.</p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a href="#signup-customers" className="bg-emerald-500 hover:bg-emerald-400 px-4 py-2 rounded-lg font-medium">Book a Cleaner</a>
+          <a href="#signup-cleaners" className="bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/40 px-4 py-2 rounded-lg font-medium">Become a Cleaner</a>
         </div>
-        <a href="#top-form" className="inline-flex">
-          <Button variant="primary">Join the interest list</Button>
-        </a>
-      </Card>
-    </Section>
-  );
-}
+      </div>
 
-function Footer() {
-  return (
-    <footer className="border-t border-white/10 mt-10">
-      <div className="mx-auto max-w-7xl px-4 py-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      {/* BIG mascot showcase */}
+      <div className="relative">
+        <div className="absolute -inset-10 bg-emerald-600/15 blur-3xl rounded-3xl"></div>
+        <div className="relative rounded-2xl border border-white/10 bg-white/5 p-8 flex flex-col items-center">
           <img
             src={LOGO_URL}
-            alt="Sheeni logo"
-            className="h-6 w-6 rounded-md object-contain ring-1 ring-white/10 shadow"
-            width={24}
-            height={24}
+            alt="Sheeni mascot"
+            className="h-40 w-40 md:h-52 md:w-52 rounded-2xl shadow-2xl ring-1 ring-white/10"
           />
-          <span className="font-semibold">Sheeni</span>
+          <p className="mt-6 text-white/80 text-center max-w-md">
+            Meet <span className="text-emerald-300">Sheeni</span>, your Cleaning Genie. Rub the lamp (okay, click the button),
+            and a nearby pro appears—ready to grant spotless wishes.
+          </p>
+          <div className="mt-5 flex gap-3">
+            <a href="#signup-customers" className="px-4 py-2 bg-emerald-500/90 rounded">Join Waitlist</a>
+            <a href="#signup-cleaners" className="bg-purple-600/30 border border-purple-400/30 hover:bg-purple-600/40 px-4 py-2 rounded-lg font-medium">Become a Genie</a>
+          </div>
         </div>
-        <div className="text-white/60">© {new Date().getFullYear()} Sheeni</div>
       </div>
-    </footer>
+    </section>
   );
 }
 
-/* ----------------- FORMS ----------------- */
-
-function CustomerForm({ compact = false }) {
-  const [loading, setLoading] = useState(false);
-  const [formKey, setFormKey] = useState(0);
-  const [sent, setSent] = useState(false);
-
-  async function submit(e) {
-    e.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    setSent(false);
-
-    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
-    data.role = 'customer';
-
-    try {
-      await postJSON('/api/waitlist/customer', data);
-      e.currentTarget.reset();
-      setFormKey(k => k + 1);
-      setSent(true);
-    } catch (err) {
-      alert('Submission failed: ' + (err.message || 'network error'));
-    } finally {
-      setLoading(false);
-    }
-  }
-
+function How(){
   return (
-    <form
-      id="top-form"
-      key={formKey}
-      onSubmit={submit}
-      autoComplete="off"
-      className={`grid gap-3 ${compact ? '' : 'md:grid-cols-2'}`}
-    >
-      <Input name="name" required placeholder="Full name" />
-      <Input type="email" name="email" required placeholder="Email" />
-      <Input name="phone" placeholder="Phone (for launch SMS)" className={compact ? '' : 'md:col-span-2'} />
-      <Input name="city" placeholder="City" />
-      <Input name="zip" placeholder="ZIP code" />
-      <Textarea name="notes" placeholder="What kind of clean do you need most?" className={compact ? '' : 'md:col-span-2 h-28'} />
-
-      <Button type="submit" loading={loading} className={compact ? '' : 'md:col-span-2'}>
-        Join the interest list
-      </Button>
-      {sent && <p className={`${compact ? '' : 'md:col-span-2'} text-emerald-300`}>Wish received! ✨</p>}
-    </form>
+    <section id="how" className="mx-auto max-w-6xl px-4 py-16">
+      <h2 className="text-3xl font-semibold">How it works</h2>
+      <div className="grid md:grid-cols-3 gap-6 mt-6">
+        <Step n={1} title="Pick your time" text="Choose 1 hour, 2 hours, or more. Pay for exactly what you need."/>
+        <Step n={2} title="Show & tell" text="Upload photos and describe the task—kitchen, bath, living areas, your call."/>
+        <Step n={3} title="Claimed in-app" text="Cleaners get an alert. First to accept claims it and heads your way."/>
+      </div>
+    </section>
   );
 }
 
-function CleanerForm({ compact = false }) {
+function Step({n,title,text}){
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 p-5">
+      <div className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-300/30 text-emerald-300">{n}</div>
+      <h3 className="mt-3 font-semibold">{title}</h3>
+      <p className="text-white/80 mt-1">{text}</p>
+    </div>
+  );
+}
+
+function Features(){
+  const items = [
+    ["Transparent pay & tips", "Set a tip upfront. Cleaners see rate + tip before accepting."],
+    ["Profiles & reviews", "See cleaner ratings and past jobs before booking."],
+    ["Live arrival ETA", "Track your Genie to your door and chat in-app."],
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 grid md:grid-cols-3 gap-6">
+      {items.map(([t,d],i)=>(
+        <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-5">
+          <h3 className="font-semibold">{t}</h3>
+          <p className="text-white/80 mt-1">{d}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function Reviews(){
+  const quotes=[
+    ["Booked a 2-hour kitchen reset before guests. Lifesaver.", "— Mia, Baldwin Park"],
+    ["As a cleaner I see pay + tip upfront. No surprises.", "— Andre, Winter Garden"],
+    ["Uploading photos kept the job focused on what mattered.", "— Leah, Thornton Park"],
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16 grid md:grid-cols-3 gap-6">
+      {quotes.map(([q,a],i)=>(
+        <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-5">
+          <p className="text-white/90">“{q}”</p>
+          <p className="text-white/60 mt-3">{a}</p>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+/* ----------------------  CUSTOMER SIGNUP  ---------------------- */
+function CustomerSignup(){
+  return (
+    <section id="signup-customers" className="mx-auto max-w-6xl px-4 py-16">
+      <div className="flex items-center gap-3 mb-4">
+        <img src={LOGO_URL} alt="" className="h-10 w-10 rounded-md ring-1 ring-white/10"/>
+        <h3 className="text-2xl font-semibold">Join the waitlist — Customers</h3>
+      </div>
+      <p className="text-white/75 mb-6">
+        Tell us where you are and what you want cleaned. We’ll notify you as soon as Genies go live in your area.
+      </p>
+      <CustomerForm/>
+    </section>
+  );
+}
+
+function CustomerForm(){
+  const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formKey, setFormKey] = useState(0);
-  const [sent, setSent] = useState(false);
 
-  async function submit(e) {
+  async function submit(e){
     e.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    setSent(false);
-
-    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
-    data.role = 'cleaner';
-
+    setLoading(true); setSent(false);
     try {
-      // Uses your server base + path
-      const r = await fetch(`${API_BASE}/api/waitlist/cleaner`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const fd = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(fd.entries());
+
+      const r = await fetch(`${API_BASE}/api/waitlist/customer`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
       });
-      const j = await r.json().catch(() => ({}));
+
+      const j = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
 
       e.currentTarget.reset();
@@ -311,106 +198,110 @@ function CleanerForm({ compact = false }) {
       key={formKey}
       onSubmit={submit}
       autoComplete="off"
-      className={`grid gap-3 ${compact ? '' : 'md:grid-cols-2'}`}
+      className="grid md:grid-cols-2 gap-3"
     >
-      <Input name="name" required placeholder="Full name" />
-      <Input type="email" name="email" required placeholder="Email" />
-      <Input name="phone" placeholder="Phone" />
-      <Input name="service_area" placeholder="Service area (ZIPs or neighborhoods)" />
-      <Textarea name="experience" placeholder="Experience (years, specialties)" className={compact ? '' : 'md:col-span-2 h-28'} />
-
-      <Button type="submit" loading={loading} className={compact ? '' : 'md:col-span-2'}>
-        Apply as a cleaner
-      </Button>
-      {sent && <p className={`${compact ? '' : 'md:col-span-2'} text-emerald-300`}>Wish received! ✨</p>}
+      <input name="name" required placeholder="Full name" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input type="email" name="email" required placeholder="Email" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="phone" placeholder="Phone" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="zip" placeholder="ZIP code" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <textarea name="notes" placeholder="What needs cleaning? (rooms, priorities)"
+                className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
+      <button type="submit" disabled={loading}
+              className="bg-emerald-500 hover:bg-emerald-400 rounded px-4 py-2 font-medium md:col-span-2">
+        {loading ? 'Submitting…' : 'Join waitlist'}
+      </button>
+      {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
     </form>
   );
 }
 
-/* ----------------- TINY PRIMITIVES ----------------- */
-
-function Section({ className = '', id, children }) {
+/* ----------------------  CLEANER SIGNUP  ---------------------- */
+function CleanerSignup(){
   return (
-    <section id={id} className={`mx-auto max-w-7xl px-4 ${className}`}>{children}</section>
+    <section id="signup-cleaners" className="mx-auto max-w-6xl px-4 py-16">
+      <div className="flex items-center gap-3 mb-4">
+        <img src={LOGO_URL} alt="" className="h-10 w-10 rounded-md ring-1 ring-white/10"/>
+        <h3 className="text-2xl font-semibold">Apply to clean — Become a Genie</h3>
+      </div>
+      <p className="text-white/75 mb-6">
+        Flexible jobs near you. See pay + tip before accepting. Get notified first; claim jobs Instacart-style.
+      </p>
+      <CleanerForm/>
+    </section>
   );
 }
 
-function Card({ className = '', children }) {
-  return (
-    <div className={`rounded-2xl border border-white/10 bg-white/[0.04] p-5 ring-1 ring-white/10 shadow-xl ${className}`}>
-      {children}
-    </div>
-  );
-}
+function CleanerForm(){
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
-function Badge({ children }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-xs text-white/90">
-      {children}
-    </span>
-  );
-}
+  async function submit(e){
+    e.preventDefault();
+    setLoading(true); setSent(false);
+    try {
+      const fd = new FormData(e.currentTarget);
+      const payload = Object.fromEntries(fd.entries());
 
-function Tabs({ tab, setTab }) {
-  return (
-    <div className="mb-6 inline-flex rounded-xl border border-white/15 bg-white/[0.06] p-1">
-      <TabButton active={tab === 'customer'} onClick={() => setTab('customer')}>
-        I’m a Customer
-      </TabButton>
-      <TabButton active={tab === 'cleaner'} onClick={() => setTab('cleaner')}>
-        I’m a Cleaner
-      </TabButton>
-    </div>
-  );
-}
+      const r = await fetch(`${API_BASE}/api/waitlist/cleaner`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-4 py-2 rounded-lg border transition ${
-        active
-          ? 'bg-purple-600 border-purple-500 text-white shadow'
-          : 'bg-transparent border-transparent text-white/85 hover:bg-white/5'
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
+      const j = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(j?.message || j?.error || `HTTP ${r.status}`);
 
-function Input({ className = '', ...props }) {
+      e.currentTarget.reset();
+      setFormKey(k => k + 1);
+      setSent(true);
+    } catch (err) {
+      alert('Submission failed: ' + (err.message || 'network error'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <input
-      {...props}
+    <form
+      key={formKey}
+      onSubmit={submit}
       autoComplete="off"
-      className={`w-full rounded-xl bg-white/5 border border-white/12 px-3 py-2 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400/60 ${className}`}
-    />
-  );
-}
-
-function Textarea({ className = '', ...props }) {
-  return (
-    <textarea
-      {...props}
-      className={`w-full rounded-xl bg-white/5 border border-white/12 px-3 py-2 placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-400/60 ${className}`}
-    />
-  );
-}
-
-function Button({ variant = 'primary', loading = false, className = '', ...props }) {
-  const base = 'inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition';
-  const styles =
-    variant === 'primary'
-      ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-900/30'
-      : 'border border-white/20 text-white/85 hover:bg-white/5';
-  return (
-    <button
-      {...props}
-      disabled={loading}
-      className={`${base} ${styles} disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className="grid md:grid-cols-2 gap-3"
     >
-      {loading ? 'Submitting…' : props.children}
-    </button>
+      <input name="name" required placeholder="Full name" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input type="email" name="email" required placeholder="Email" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="phone" placeholder="Phone" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <input name="service_area" placeholder="Service area (ZIPs or neighborhoods)" autoComplete="off"
+             className="bg-white/10 border border-white/15 rounded px-3 py-2" />
+      <textarea name="experience" placeholder="Experience (years, specialties)"
+                className="md:col-span-2 bg-white/10 border border-white/15 rounded px-3 py-2 h-28"></textarea>
+      <button type="submit" disabled={loading}
+              className="bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium md:col-span-2">
+        {loading ? 'Submitting…' : 'Apply as a cleaner'}
+      </button>
+      {sent && <p className="text-emerald-300 md:col-span-2">Wish received! ✨</p>}
+    </form>
+  );
+}
+
+function Footer(){
+  return (
+    <footer className="border-t border-white/10 mt-10">
+      <div className="mx-auto max-w-6xl px-4 py-10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src={LOGO_URL} className="h-10 w-10 rounded-md shadow" alt="Sheeni logo"/>
+          <span className="font-semibold">Sheeni</span>
+        </div>
+        <div className="text-white/60">© {new Date().getFullYear()} Sheeni</div>
+      </div>
+    </footer>
   );
 }
