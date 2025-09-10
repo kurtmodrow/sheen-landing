@@ -2,11 +2,10 @@
 import { useState } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || ""; // e.g. https://sheeni-server.onrender.com
-// If your logo file has a space (e.g., "Sheeni Logo.png"), either rename it to /public/logo.png
-// or set LOGO_URL = '/Sheeni%20Logo.png'
+// If your file has a space, use '/Sheeni%20Logo.png' or rename it to /public/logo.png
 const LOGO_URL = "/logo.png";
 
-// ---- helper: JSON POST with friendly errors
+// Helper: JSON POST with friendly errors
 async function postJSON(path, payload) {
   const r = await fetch(`${API_BASE}${path}`, {
     method: "POST",
@@ -21,6 +20,7 @@ async function postJSON(path, payload) {
 
 export default function Page() {
   const [tab, setTab] = useState("customer"); // 'customer' | 'cleaner'
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-violet-900 via-indigo-900 to-slate-900 text-white">
       <Header />
@@ -28,24 +28,28 @@ export default function Page() {
 
       <section className="mx-auto max-w-6xl px-4 py-8">
         <div className="bg-white/5 border border-white/10 rounded-2xl shadow-xl p-4 md:p-8">
+          {/* Tab buttons (card section) */}
           <div className="flex gap-2 mb-6">
             <button
               onClick={() => setTab("customer")}
-              className={`px-4 py-2 rounded-lg border ${
-                tab === "customer"
-                  ? "bg-purple-600 border-purple-500"
-                  : "bg-white/5 border-white/10 hover:bg-white/10"
-              }`}
+              className={`px-4 py-2 rounded-lg border transition
+                ${
+                  tab === "customer"
+                    ? "bg-purple-600 border-purple-500 text-white shadow"
+                    : "bg-transparent border-white/20 text-white/85 hover:bg-white/5"
+                }`}
             >
               I’m a Customer
             </button>
+
             <button
               onClick={() => setTab("cleaner")}
-              className={`px-4 py-2 rounded-lg border ${
-                tab === "cleaner"
-                  ? "bg-purple-600 border-purple-500"
-                  : "bg-white/5 border-white/10 hover:bg-white/10"
-              }`}
+              className={`px-4 py-2 rounded-lg border transition
+                ${
+                  tab === "cleaner"
+                    ? "bg-purple-600 border-purple-500 text-white shadow"
+                    : "bg-transparent border-white/20 text-white/85 hover:bg-white/5"
+                }`}
             >
               I’m a Cleaner
             </button>
@@ -67,7 +71,7 @@ function Header() {
     <header className="border-b border-white/10">
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* small, crisp logo */}
+          {/* small, crisp logo (no oversized look) */}
           <img
             src={LOGO_URL}
             alt="Sheeni logo"
@@ -116,24 +120,28 @@ function Hero({ switchTab, active }) {
             Early sign-ups get first dibs at launch.
           </p>
 
+          {/* Tab buttons (hero section) */}
           <div className="flex gap-2">
             <button
               onClick={() => switchTab("customer")}
-              className={`px-4 py-2 rounded-lg border ${
-                active === "customer"
-                  ? "bg-purple-600 border-purple-500"
-                  : "bg-white/5 border-white/10 hover:bg-white/10"
-              }`}
+              className={`px-4 py-2 rounded-lg border transition
+                ${
+                  active === "customer"
+                    ? "bg-purple-600 border-purple-500 text-white shadow"
+                    : "bg-transparent border-white/20 text-white/85 hover:bg-white/5"
+                }`}
             >
               Join as Customer
             </button>
+
             <button
               onClick={() => switchTab("cleaner")}
-              className={`px-4 py-2 rounded-lg border ${
-                active === "cleaner"
-                  ? "bg-purple-600 border-purple-500"
-                  : "bg-white/5 border-white/10 hover:bg-white/10"
-              }`}
+              className={`px-4 py-2 rounded-lg border transition
+                ${
+                  active === "cleaner"
+                    ? "bg-purple-600 border-purple-500 text-white shadow"
+                    : "bg-transparent border-white/20 text-white/85 hover:bg-white/5"
+                }`}
             >
               Apply as Cleaner
             </button>
@@ -153,6 +161,7 @@ function Hero({ switchTab, active }) {
   );
 }
 
+/* ------- tiny UI primitives ------- */
 function Input({ className = "", ...props }) {
   return (
     <input
@@ -161,7 +170,6 @@ function Input({ className = "", ...props }) {
     />
   );
 }
-
 function Textarea({ className = "", ...props }) {
   return (
     <textarea
@@ -171,6 +179,7 @@ function Textarea({ className = "", ...props }) {
   );
 }
 
+/* ------- forms ------- */
 function CustomerForm({ compact = false }) {
   const [loading, setLoading] = useState(false);
   const [formKey, setFormKey] = useState(0);
@@ -228,9 +237,7 @@ function CustomerForm({ compact = false }) {
       <button
         type="submit"
         disabled={loading}
-        className={`bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium ${
-          compact ? "" : "md:col-span-2"
-        }`}
+        className={`bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium ${compact ? "" : "md:col-span-2"}`}
       >
         {loading ? "Submitting…" : "Join the interest list"}
       </button>
@@ -306,9 +313,7 @@ function CleanerForm({ compact = false }) {
       <button
         type="submit"
         disabled={loading}
-        className={`bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium ${
-          compact ? "" : "md:col-span-2"
-        }`}
+        className={`bg-purple-500 hover:bg-purple-400 rounded px-4 py-2 font-medium ${compact ? "" : "md:col-span-2"}`}
       >
         {loading ? "Submitting…" : "Apply as a cleaner"}
       </button>
@@ -321,6 +326,7 @@ function CleanerForm({ compact = false }) {
   );
 }
 
+/* ------- content sections ------- */
 function Features() {
   return (
     <section id="how" className="mx-auto max-w-6xl px-4 py-12">
