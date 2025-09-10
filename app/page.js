@@ -18,7 +18,7 @@ export default function Page() {
     e.preventDefault();
     setStatus('loading'); setError('');
 
-    const url = tab === 'customer' ? '/api/customer' : '/api/cleaner';
+    const url = tab === 'customer' ? '/api/waitlist/customer' : '/api/waitlist/cleaner';
     const body = tab === 'customer' ? { ...cust } : { ...clean };
 
     try {
